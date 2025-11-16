@@ -23,6 +23,10 @@ sort_versions() {
 		LC_ALL=C sort -t. -k 1,1 -k 2,2n -k 3,3n -k 4,4n -k 5,5n | awk '{print $2}'
 }
 
+version_lt() {
+    [[ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1)" != "$2" ]]
+}
+
 list_github_tags() {
 	git ls-remote --tags --refs "$GH_REPO" |
 		grep -o 'refs/tags/.*' | cut -d/ -f3- |
@@ -90,7 +94,7 @@ download_release() {
 		fi
 	fi
 
-	if [[ "$version" < "0.5.0" ]]; then
+	if version_lt "$version" "0.5.0"; then
 		url="$GH_REPO/releases//download/v${version}/$TOOL_NAME-${version}-${architecture}-${os}.${ext}"
 	else
 		url="$GH_REPO/releases//download/${version}/$TOOL_NAME-${architecture}-${os}.${ext}"
